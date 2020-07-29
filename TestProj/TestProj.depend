@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1596025526 source:c:\users\kobus\onedrive - stellenbosch university\skripsiecode\testproj\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+

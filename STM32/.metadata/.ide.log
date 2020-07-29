@@ -1,0 +1,10 @@
+2020-07-29 14:43:35,875 [INFO] Activator:178 - 
+
+
+2020-07-29 14:43:35,875 [INFO] Activator:179 - !SESSION log4j initialized
+2020-07-29 14:45:45,479 [INFO] Activator:178 - 
+
+
+2020-07-29 14:45:45,484 [INFO] Activator:179 - !SESSION log4j initialized
+2020-07-29 14:46:14,219 [INFO] RetryExec:97 - I/O exception (java.net.SocketException) caught when processing request to {s}->https://download.eclipse.org:443: Socket operation on nonsocket: configureBlocking
+2020-07-29 14:46:14,229 [INFO] RetryExec:113 - Retrying request to {s}->https://download.eclipse.org:443
