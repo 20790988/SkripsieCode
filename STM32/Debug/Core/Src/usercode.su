@@ -1,1 +1,2 @@
-usercode.c:14:6:handleUARTInterrupt	0	static
+usercode.c:15:6:handleUARTInterrupt	0	static
+usercode.c:36:6:stringComp	8	static

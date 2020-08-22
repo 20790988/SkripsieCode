@@ -2,46 +2,30 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-void shift_out(uint8_t dat);
-void print_b(int num, int len);
+enum Boolean {FALSE,TRUE};
+typedef enum Boolean bool;
+
+bool stringComp(const char str1[], const char str2[], int length);
 
 int main()
-{
+{   bool bool1 = stringComp("ping","ping",4);
+    bool bool2 = stringComp("pingo","pingu",4);
+    bool bool3 = stringComp("ping","pong",4);
 
+    printf("%d %d %d",bool1,bool2,bool3);
     return 0;
 }
 
-void shift_out(uint8_t dat)
+bool stringComp(const char str1[], const char str2[], int length)
 {
-	for (uint8_t i = 0; i<8; i++)
-	{
-	    //temp =
-		//print()
-	}
-}
-
-void print_b(int num, int nibbles)
-{
-    int len = nibbles*4;
-    char str[len+1];
-
-    for (int i = 0; i<len; i++)
+  bool isSame = TRUE;
+  for (int i = 0; i<length;i++)
+  {
+    if (str1[i] != str2[i])
     {
-        int index = len-i-1;
-        str[len-i-1] = '0' + (num>>i & 1);
+      isSame = FALSE;
+      break;
     }
-
-    str[len] = '\0';
-
-    for (int i = 0; i<len/4;i++)
-    {
-        char temp[5];
-        temp[0] = str[i*4+0];
-        temp[1] = str[i*4+1];
-        temp[2] = str[i*4+2];
-        temp[3] = str[i*4+3];
-        temp[4] = '\0';
-        printf("%s ",temp);
-    }
-    printf("\n");
+  }
+  return isSame;
 }

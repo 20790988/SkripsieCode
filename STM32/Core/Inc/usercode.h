@@ -8,14 +8,20 @@
 #ifndef INC_USERCODE_H_
 #define INC_USERCODE_H_
 
+#include "stdbool.h"
+
 #define INPUT_LENGTH 20
 
-enum Boolean {FALSE,TRUE};
-typedef enum Boolean bool;
+enum Receiver {IDLE,RECEIVING,DONE};
+typedef enum Receiver receiver;
+
+//int sine[8] = {2048,3251,2995,3996,2051,847,101,98};
 
 void handleUARTInterrupt(char inchar);
-void handleMsg();
+void handleMsg(char str[], int length);
 
-bool stringComp(char str1[], char str2[]);
+bool stringComp(const char str1[], const char str2[],int length);
+
+
 
 #endif /* INC_USERCODE_H_ */

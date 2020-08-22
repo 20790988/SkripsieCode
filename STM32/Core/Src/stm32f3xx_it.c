@@ -57,6 +57,9 @@ extern volatile bool msg_pending;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DAC_HandleTypeDef hdac1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim6;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 
@@ -199,6 +202,20 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
   * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXT line 26.
   */
 void USART2_IRQHandler(void)
@@ -217,6 +234,26 @@ void USART2_IRQHandler(void)
     handleUARTInterrupt(inchar);
   }
   /* USER CODE END USART2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM6 global and DAC1 underrun error interrupts.
+  */
+void TIM6_DAC1_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM6_DAC1_IRQn 0 */
+
+
+  /* USER CODE END TIM6_DAC1_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim6);
+  HAL_DAC_IRQHandler(&hdac1);
+  /* USER CODE BEGIN TIM6_DAC1_IRQn 1 */
+  int flag = __HAL_DAC_GET_FLAG(&hdac1,DAC_FLAG_DMAUDR1);
+  if (flag)
+  {
+    HAL_UART_Transmit_IT(&huart2, (uint8_t*)"oof\n", 4);
+  }
+  /* USER CODE END TIM6_DAC1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
