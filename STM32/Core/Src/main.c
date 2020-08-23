@@ -51,8 +51,9 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-extern volatile receiver PC_UART;
-extern char rxdata[INPUT_LENGTH];
+extern volatile receiver_t PC_UART;
+extern char pc_message[];
+extern char gps_message[];
 extern int rxlen;
 /* USER CODE END PV */
 
@@ -115,6 +116,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   __HAL_UART_ENABLE_IT(&huart2,UART_IT_RXNE);
   __HAL_UART_ENABLE_IT(&huart2,UART_IT_TC);
+  __HAL_UART_ENABLE_IT(&huart1,UART_IT_RXNE);
+  __HAL_UART_ENABLE_IT(&huart1,UART_IT_TC);
+
   HAL_TIM_Base_Start(&htim6);
 
   uint8_t time = 0;
@@ -130,12 +134,12 @@ int main(void)
     if (PC_UART == DONE)
     {
 
-      if (stringComp("ping", rxdata, 4))
+      if (is_same_string("ping", pc_message, 4))
       {
         HAL_UART_Transmit_IT(&huart2, (uint8_t*)"pong\n", 5);
       }
 
-      if (stringComp("pulse", rxdata, 5))
+      if (is_same_string("pulse", pc_message, 5))
       {
         HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
         uint32_t pulse[] = {0xFFF,0xFFF,0,0,0xFFF,0,0xFFF,0};
@@ -149,7 +153,7 @@ int main(void)
 //        HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, sine, 8, DAC_ALIGN_12B_R);
       }
 
-      if (stringComp("low", rxdata, 3))
+      if (is_same_string("low", pc_message, 3))
       {
         HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
 //        HAL_DAC_Stop(&hdac1, DAC_CHANNEL_1);
@@ -160,20 +164,7 @@ int main(void)
     }
 
 
-//	  if (i==0)
-//	  {
-//		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-//		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-//		  i = 1;
-//	  }
-//	  else
-//	  {
-//		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-//		  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-//		  i=0;
-//	  }
-	  //shift_out(GPIOB,GPIO_PIN_13, (uint8_t)0b1010);
-	  //shift_out(GPIOB, GPIO_PIN_13, (uint8_t)time);
+
 
 
     /* USER CODE END WHILE */
@@ -231,6 +222,9 @@ void SystemClock_Config(void)
   */
 static void MX_NVIC_Init(void)
 {
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USART2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(USART2_IRQn);

@@ -60,6 +60,7 @@ extern volatile bool msg_pending;
 extern DAC_HandleTypeDef hdac1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim6;
+extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 
@@ -233,6 +234,25 @@ void TIM2_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXT line 25.
+  */
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+  int  flag = __HAL_UART_GET_FLAG(&huart1,UART_FLAG_RXNE);
+  char  inchar;
+  /* USER CODE END USART1_IRQn 0 */
+  HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
+  if (flag == 1)
+    {
+      inchar = (uint8_t)huart1.Instance->RDR;
+      handle_uart_interrupt_gps(inchar);
+    }
+  /* USER CODE END USART1_IRQn 1 */
+}
+
+/**
   * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXT line 26.
   */
 void USART2_IRQHandler(void)
@@ -248,7 +268,7 @@ void USART2_IRQHandler(void)
   if (flag == 1)
   {
     inchar = (uint8_t)huart2.Instance->RDR;
-    handleUARTInterrupt(inchar);
+    handle_uart_interrupt_pc(inchar);
   }
   /* USER CODE END USART2_IRQn 1 */
 }

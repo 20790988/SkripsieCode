@@ -10,17 +10,15 @@
 
 #include "stdbool.h"
 
-#define INPUT_LENGTH 20
+#define INPUT_LENGTH 100
 
 enum Receiver {IDLE,RECEIVING,DONE};
-typedef enum Receiver receiver;
+typedef enum Receiver receiver_t;
 
-//int sine[8] = {2048,3251,2995,3996,2051,847,101,98};
+void handle_uart_interrupt_pc(char inchar);
+void handle_uart_interrupt_gps(char inchar);
 
-void handleUARTInterrupt(char inchar);
-void handleMsg(char str[], int length);
-
-bool stringComp(const char str1[], const char str2[],int length);
+bool is_same_string(const char str1[], const char str2[],int length);
 
 
 

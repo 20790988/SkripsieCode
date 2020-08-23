@@ -1,2 +1,3 @@
-usercode.c:15:6:handleUARTInterrupt	0	static
-usercode.c:36:6:stringComp	8	static
+usercode.c:19:6:handle_uart_interrupt_pc	0	static
+usercode.c:40:6:handle_uart_interrupt_gps	0	static
+usercode.c:45:6:is_same_string	8	static
