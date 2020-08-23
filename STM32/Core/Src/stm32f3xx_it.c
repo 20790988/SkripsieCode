@@ -202,6 +202,23 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles EXTI line 0 interrupt.
+  */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+  HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+  uint32_t pulse[] = {0xFFF,0xFFF,0,0,0xFFF,0,0xFFF,0};
+  //uint32_t sine[] = {2048,3251,2995,3996,2051,847,101,98};
+  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, pulse, 8, DAC_ALIGN_12B_R);
+  /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM2 global interrupt.
   */
 void TIM2_IRQHandler(void)
