@@ -39,7 +39,23 @@ void handle_uart_interrupt_pc(char inchar)
 
 void handle_uart_interrupt_gps(char inchar)
 {
+    static int current_index = 0;
 
+    if (inchar == '$')
+    {
+        current_index = 0;
+       GPS_UART = RECEIVING;
+    }
+    else if (inchar == '*')
+    {
+        gps_message_length = current_index;
+        GPS_UART = DONE;
+    }
+    else if (GPS_UART == RECEIVING && current_index < INPUT_LENGTH)
+    {
+        gps_message[current_index] = inchar;
+        current_index++;
+    }
 }
 
 bool is_same_string(const char str1[], const char str2[], int length)
