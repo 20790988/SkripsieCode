@@ -57,6 +57,7 @@ extern char pc_message[];
 extern char gps_message[];
 extern volatile int pc_message_length;
 extern volatile int gps_message_length;
+extern char timecode[TIMECODE_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,7 +86,7 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
     /* USER CODE BEGIN 1 */
-
+    concat_timecode();
     /* USER CODE END 1 */
 
     /* MCU Configuration--------------------------------------------------------*/
@@ -123,9 +124,6 @@ int main(void)
 
     HAL_TIM_Base_Start(&htim6);
 
-    uint8_t time = 0;
-    //HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -145,33 +143,24 @@ int main(void)
             {
                 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
                 uint32_t pulse[] = { 0xFFF, 0xFFF, 0, 0, 0xFFF, 0, 0xFFF, 0 };
-                //uint32_t sine[] = {2048,3251,2995,3996,2051,847,101,98};
                 HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, pulse, 8,
-                        DAC_ALIGN_12B_R);
+                DAC_ALIGN_12B_R);
 
                 HAL_UART_Transmit_IT(&huart2, (uint8_t*) "high\n", 5);
-
-//        HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_8B_R , 0xFF);
-//        HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
-//        HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, sine, 8, DAC_ALIGN_12B_R);
-            }
-
-            if (is_same_string("low", pc_message, 3))
-            {
-                HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
-//        HAL_DAC_Stop(&hdac1, DAC_CHANNEL_1);
 
             }
 
             if (is_same_string("NMEAquery", pc_message, 9))
             {
-                HAL_UART_Transmit_IT(&huart2, (uint8_t*)"query\n", 6);
-                HAL_UART_Transmit_IT(&huart1, (uint8_t*)"$PMTK414*33\r\n", 13);
+                HAL_UART_Transmit_IT(&huart2, (uint8_t*) "query\n", 6);
+                HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PMTK414*33\r\n", 13);
             }
 
             if (is_same_string("NMEAset", pc_message, 7))
             {
-                HAL_UART_Transmit_IT(&huart1, (uint8_t*)"$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n", 51);
+                HAL_UART_Transmit_IT(&huart1,
+                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
+                        51);
             }
 
             PC_UART = IDLE;

@@ -1,3 +1,4 @@
-usercode.c:19:6:handle_uart_interrupt_pc	0	static
-usercode.c:40:6:handle_uart_interrupt_gps	0	static
-usercode.c:61:6:is_same_string	8	static
+usercode.c:23:6:handle_uart_interrupt_pc	0	static
+usercode.c:44:6:handle_uart_interrupt_gps	0	static
+usercode.c:65:6:concat_timecode	0	static
+usercode.c:98:6:is_same_string	8	static

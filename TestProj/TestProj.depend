@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1598095014 source:c:\users\kobus\onedrive - stellenbosch university\skripsiecode\testproj\main.c
+1600183559 source:c:\users\kobus\onedrive - stellenbosch university\skripsiecode\testproj\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdint.h>
+	<math.h>
+	<stdbool.h>
 
