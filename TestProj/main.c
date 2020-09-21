@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define TIMECODE_LENGTH 18
+#define TIMECODE_LENGTH 100
 #define IGNORE_CHECKSUM
 
 static int hour = 0;
@@ -18,7 +18,7 @@ static int day = 0;
 static float lat = 0;
 static float lon = 0;
 
-void concat_timecode(int seconds);
+void concat_timecode(int year, int month, int day, int hour, int minute, int seconds);
 void print_b(int num, int nibbles);
 bool is_checksum_good(char* givenString, int len);
 void parse_nmea(char* GPSString, int GPSStringLen);
@@ -28,24 +28,102 @@ void parse_date(char* time);
 int parse_char(char c);
 float parse_double(char* str,int len);
 void copy_array_by_value(char* original, char* copy, int len);
-
+void insert_binary_into_string(char* p_timecode, int num, int len);
+int days_in_year(int year, int month, int day);
 
 int main()
 {
-    char str[] = "GPRMC,064951.000,A,2307.1256,N,12016.4438,E,0.03,165.48,260406,3.05,W,A*2C";
-    int GPSStringLen = 72;
-    parse_nmea(str,GPSStringLen);
+    //char str[] = "GPRMC,064951.000,A,2307.1256,N,0,E,0.03,165.48,260406,3.05,W,A*2C";
+    //int GPSStringLen = 72;
+    //parse_nmea(str,GPSStringLen);
+    //char str[] = "P000I";
+    //for (int i = 0; i<18;i++)
+    //{
+    //    insert_binary_into_string(&str[1], i, 3);
+    //    puts(str);
+    //}
+    concat_timecode(2020,9,21,15,50,31);
     return 0;
 }
 
-void concat_timecode(int seconds)
+void concat_timecode(int year, int month, int day, int hour, int minute, int seconds)
 {
-    char timecode[] = "P00000000000000000";
-    for (int i = 0; i<TIMECODE_LENGTH-1; i++)
+    char timecode[TIMECODE_LENGTH+1] =
+    "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
+
+    insert_binary_into_string(&timecode[1],seconds%10,4);
+    insert_binary_into_string(&timecode[6],seconds/10,3);
+
+    insert_binary_into_string(&timecode[10],minute%10,4);
+    insert_binary_into_string(&timecode[15],minute/10,3);
+
+    insert_binary_into_string(&timecode[20],hour%10,4);
+    insert_binary_into_string(&timecode[25],hour/10,2);
+
+    int day_of_year = days_in_year(year,month,day);
+    printf("days of year %d\n",day_of_year);
+    insert_binary_into_string(&timecode[30],day_of_year%10,4);
+    insert_binary_into_string(&timecode[35],(day_of_year%100)/10,4);
+    insert_binary_into_string(&timecode[40],day_of_year/100,2);
+
+    insert_binary_into_string(&timecode[50],year%10,4);
+    insert_binary_into_string(&timecode[55],(year%100)/10,4);
+
+
+    int seconds_of_day = hour*3600+minute*60+seconds;
+    printf("seconds of day%d\n",seconds_of_day);
+    for (int i = 0; i<=16; i++)
     {
-        timecode[i+1] = '0' + (seconds>>i & 1);
+        if (i<9)
+        {
+            timecode[80+i] = '0' + (seconds_of_day>>i & 1);
+        }
+        else
+        {
+            timecode[80+i+1] = '0' + (seconds_of_day>>i & 1);
+        }
     }
     puts(timecode);
+}
+
+int days_in_year(int year, int month, int day)
+{
+    int days_in_month[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+    int day_of_year  = day;
+    for (int i = 0; i<month-1; i++)
+    {
+        day_of_year += days_in_month[i];
+    }
+
+    if (year % 4 == 0 && month>2)
+    {
+        day_of_year++;
+    }
+    return day_of_year;
+}
+void insert_binary_into_string(char* p_timecode, int num, int len)
+{
+    puts(p_timecode);
+    printf("%d\n",num);
+    printf("%d\n",len);
+
+
+    if (num<10 && num < pow(2,len))
+    {
+        for (int i = 0; i<len; i++)
+        {
+            p_timecode[i] = '0' + (num>>i & 1);
+        }
+    }
+    else
+    {
+        for (int i = 0; i<len; i++)
+        {
+            p_timecode[i] = 'E';
+        }
+    }
+    puts(p_timecode);
+    puts("");
 }
 
 void print_b(int num, int nibbles)
@@ -112,6 +190,7 @@ void parse_nmea(char* GPSString, int GPSStringLen)
 
     float l_lat = 0;
     float l_lon = 0;
+
 	char** strings = malloc((sizeof(char*))*11);
 
 	int i = 0;
@@ -148,16 +227,22 @@ void parse_nmea(char* GPSString, int GPSStringLen)
 	//parse time
 	if (strings[1]-strings[0] != 1)
 	{
-		parse_time(strings[0]);
+	    char* time = strings[0];
+		l_hour = 10*parse_char(time[0])+parse_char(time[1]);
+        l_min = 10*parse_char(time[2])+parse_char(time[3]);
+        l_sec = 10*parse_char(time[4])+parse_char(time[5]);
 	}
-    printf("%d %d %d\n",hour,min,sec);
+    printf("%d %d %d\n",l_hour,l_min,l_sec);
 
     //parse date
 	if (strings[9]-strings[8] != 1)
 	{
-		parse_date(strings[8]);
+	    char* date = strings[8];
+        l_day = 10*parse_char(date[0])+parse_char(date[1]);
+        l_month = 10*parse_char(date[2])+parse_char(date[3]);
+        l_year = 10*parse_char(date[4])+parse_char(date[5]);
 	}
-    printf("%d %d %d\n",day,month,year);
+    printf("%d %d %d\n",l_day,l_month,l_year);
 
 
 	//check if device has a gps fix
@@ -178,34 +263,45 @@ void parse_nmea(char* GPSString, int GPSStringLen)
 	//parse latitude if it has gps fix
 	if (strings[3]-strings[2] != 1 && GPSFix)
 	{
-		lat = 10*parse_char(strings[2][0])+parse_char(strings[2][1])+ parse_double(&strings[2][2],strings[2]-strings[2]-3)/60.0;
+		l_lat = 10*parse_char(strings[2][0])+parse_char(strings[2][1])+ parse_double(&strings[2][2],strings[2]-strings[2]-3)/60.0;
 
 		if (strings[4]-strings[3] != 1)
 		{
 			if(strings[3][0] == 'S')
 			{
-				lat *= -1;
+				l_lat *= -1;
 			}
 		}
 	}
-	printf("%f\n",lat);
+	printf("%f\n",l_lat);
 
 	//parse longitude and checks burn conditions if it has gps fix
 	if (strings[5]-strings[4] != 1 && GPSFix)
 	{
-		lon = 100*parse_char(strings[4][0])+10*parse_char(strings[4][1]) + parse_char(strings[4][2]) + parse_double(&strings[4][3],strings[5]-strings[4]-4)/60.0;
+		l_lon = 100*parse_char(strings[4][0])+10*parse_char(strings[4][1]) + parse_char(strings[4][2]) + parse_double(&strings[4][3],strings[5]-strings[4]-4)/60.0;
 
 		if (strings[6]-strings[5] != 1)
 		{
 			if(strings[5][0] == 'W')
 			{
-				lon *= -1;
+				l_lon *= -1;
 			}
 		}
 	}
-	printf("%f\n",lon);
+	printf("%f\n",l_lon);
 
 	free(strings);
+
+    hour = l_hour;
+    min = l_min;
+    sec = l_sec;
+
+    year = l_year;
+    month = l_month;
+    day = l_day;
+
+    lat = l_lat;
+    lon = l_lon;
 }
 
 //checks if two strings have the same characters up until length len
@@ -250,22 +346,6 @@ bool equals(char* str1, char* str2, int len, bool ignoreCase)
 	}
 
 	return equal;
-}
-
-//extracts time from given string to local variables. Assumes format hhmmss
-void parse_time(char* time)
-{
-	hour = 10*parse_char(time[0])+parse_char(time[1]);
-	min = 10*parse_char(time[2])+parse_char(time[3]);
-	sec = 10*parse_char(time[4])+parse_char(time[5]);
-}
-
-//extracts time from given string to local variables. Assumes format ddmmyy
-void parse_date(char* date)
-{
-	day = 10*parse_char(date[0])+parse_char(date[1]);
-	month = 10*parse_char(date[2])+parse_char(date[3]);
-	year = 10*parse_char(date[4])+parse_char(date[5]);
 }
 
 //converts a character to its numerical equivalent for example '3' -> 3
