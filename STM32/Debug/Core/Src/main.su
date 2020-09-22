@@ -1,11 +1,11 @@
-main.c:439:13:MX_DMA_Init	8	static
-main.c:452:13:MX_GPIO_Init	56	static
+main.c:457:13:MX_GPIO_Init	56	static
+main.c:439:13:MX_DMA_Init	16	static
+main.c:230:13:MX_NVIC_Init	8	static
 main.c:404:13:MX_USART2_UART_Init	8	static
 main.c:369:13:MX_USART1_UART_Init	8	static
 main.c:248:13:MX_DAC1_Init	32	static
 main.c:286:13:MX_TIM2_Init	48	static
 main.c:331:13:MX_TIM6_Init	32	static
-main.c:230:13:MX_NVIC_Init	8	static
 main.c:188:6:SystemClock_Config	104	static
 main.c:86:5:main	48	static
-main.c:488:6:Error_Handler	0	static
+main.c:493:6:Error_Handler	0	static

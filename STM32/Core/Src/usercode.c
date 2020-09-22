@@ -8,6 +8,7 @@
 #include "usercode.h"
 #include "stdbool.h"
 #include "stdint.h"
+#include "stm32f3xx_hal.h"
 
 char pc_message[INPUT_LENGTH];
 char gps_message[INPUT_LENGTH];
@@ -19,6 +20,8 @@ volatile int pc_message_length = 0;
 volatile int gps_message_length = 0;
 volatile receiver_t PC_UART = IDLE;
 volatile receiver_t GPS_UART = IDLE;
+
+extern TIM_HandleTypeDef htim6;
 
 void handle_uart_interrupt_pc(char inchar)
 {
@@ -78,13 +81,13 @@ void concat_timecode()
         switch(timecode[i])
         {
         case 'P':
-            timecode_pulse[i] = 0x800;
+            timecode_pulse[i] = 310;
             break;
         case '0':
             timecode_pulse[i] = 0x000;
             break;
         case '1':
-            timecode_pulse[i] = 0xFFF;
+            timecode_pulse[i] = 620;
             break;
         default:
             timecode_pulse[i] = 0x000;
@@ -93,7 +96,6 @@ void concat_timecode()
 
     seconds++;
 }
-
 
 bool is_same_string(const char str1[], const char str2[], int length)
 {
@@ -109,3 +111,8 @@ bool is_same_string(const char str1[], const char str2[], int length)
     return isSame;
 }
 
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdac)
+{
+    //HAL_DAC_Stop_DMA(hdac, DAC_CHANNEL_1);
+    HAL_TIM_Base_Stop_IT(&htim6);
+}

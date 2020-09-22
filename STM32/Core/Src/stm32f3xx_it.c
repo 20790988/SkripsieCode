@@ -58,6 +58,7 @@ extern volatile char timecode[];
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_dac1_ch1;
 extern DAC_HandleTypeDef hdac1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim6;
@@ -215,10 +216,24 @@ void EXTI0_IRQHandler(void)
   /* USER CODE BEGIN EXTI0_IRQn 1 */
   HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
   HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)timecode_pulse, TIMECODE_LENGTH, DAC_ALIGN_12B_R);
-
+  HAL_TIM_Base_Start_IT(&htim6);
   concat_timecode();
 
   /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_dac1_ch1);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
 }
 
 /**
@@ -282,16 +297,11 @@ void TIM6_DAC1_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC1_IRQn 0 */
 
-
   /* USER CODE END TIM6_DAC1_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   HAL_DAC_IRQHandler(&hdac1);
   /* USER CODE BEGIN TIM6_DAC1_IRQn 1 */
-  int flag = __HAL_DAC_GET_FLAG(&hdac1,DAC_FLAG_DMAUDR1);
-  if (flag)
-  {
-    HAL_UART_Transmit_IT(&huart2, (uint8_t*)"oof\n", 4);
-  }
+
   /* USER CODE END TIM6_DAC1_IRQn 1 */
 }
 
