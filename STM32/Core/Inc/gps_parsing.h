@@ -9,6 +9,7 @@
 #define INC_GPS_PARSING_H_
 
 #define TIMECODE_LENGTH 100
+#define PULSE_LENGTH 2
 
 void concat_timecode();
 void print_b(uint32_t num, uint32_t nibbles);

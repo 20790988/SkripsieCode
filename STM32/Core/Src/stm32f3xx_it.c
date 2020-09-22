@@ -216,7 +216,7 @@ void EXTI0_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
   HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
-  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)timecode_pulse, TIMECODE_LENGTH, DAC_ALIGN_12B_R);
+  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)timecode_pulse, TIMECODE_LENGTH*PULSE_LENGTH, DAC_ALIGN_12B_R);
   HAL_TIM_Base_Start_IT(&htim6);
 
   concat_timecode();

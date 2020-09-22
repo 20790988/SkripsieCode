@@ -14,8 +14,8 @@
 char pc_message[INPUT_LENGTH];
 char gps_message[INPUT_LENGTH];
 
-char timecode[TIMECODE_LENGTH+1];
-uint32_t timecode_pulse[TIMECODE_LENGTH];
+extern char timecode[];
+extern uint32_t timecode_pulse[];
 
 volatile int pc_message_length = 0;
 volatile int gps_message_length = 0;

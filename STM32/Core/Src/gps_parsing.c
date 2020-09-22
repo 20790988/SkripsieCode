@@ -16,15 +16,15 @@
 #define IGNORE_CHECKSUM
 
 char timecode[TIMECODE_LENGTH+1]=  "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
-uint32_t timecode_pulse[TIMECODE_LENGTH];
+uint32_t timecode_pulse[TIMECODE_LENGTH*PULSE_LENGTH];
 
-static uint32_t hour = 9;
-static uint32_t min = 3;
-static uint32_t sec = 21;
+static uint32_t hour = 0;
+static uint32_t min = 0;
+static uint32_t sec = 0;
 
 static uint32_t year = 2020;
-static uint32_t month = 9;
-static uint32_t day = 22;
+static uint32_t month = 1;
+static uint32_t day = 1;
 
 //static float lat = 0;
 //static float lon = 0;
@@ -66,23 +66,26 @@ void concat_timecode()
 
     for (int i = 0; i < TIMECODE_LENGTH; i++)
     {
+        uint32_t position = i*PULSE_LENGTH;
         switch (timecode[i])
         {
         case 'P':
-            timecode_pulse[i] = 310;
+            timecode_pulse[position] = 310;
             break;
         case 'I':
-            timecode_pulse[i] = 155;
+            timecode_pulse[position] = 155;
             break;
         case '0':
-            timecode_pulse[i] = 0x000;
+            timecode_pulse[position] = 0x000;
             break;
         case '1':
-            timecode_pulse[i] = 620;
+            timecode_pulse[position] = 620;
             break;
         default:
-            timecode_pulse[i] = 0x000;
+            timecode_pulse[position] = 0x000;
         }
+
+        timecode_pulse[position+1] = 0x000;
     }
 }
 
