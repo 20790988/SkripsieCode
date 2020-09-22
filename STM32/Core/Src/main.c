@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "usercode.h"
 #include "stdio.h"
+#include "gps_parsing.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,7 +58,7 @@ extern char pc_message[];
 extern char gps_message[];
 extern volatile int pc_message_length;
 extern volatile int gps_message_length;
-extern char timecode[TIMECODE_LENGTH];
+extern char timecode[];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,15 +140,10 @@ int main(void)
                 HAL_UART_Transmit_IT(&huart2, (uint8_t*) "pong\n", 5);
             }
 
-            if (is_same_string("pulse", pc_message, 5))
+            if (is_same_string("send", pc_message, 4))
             {
-                HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
-                uint32_t pulse[] = { 0xFFF, 0xFFF, 0, 0, 0xFFF, 0, 0xFFF, 0 };
-                HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, pulse, 8,
-                DAC_ALIGN_12B_R);
-
-                HAL_UART_Transmit_IT(&huart2, (uint8_t*) "high\n", 5);
-
+                HAL_UART_Transmit_IT(&huart2, (uint8_t*) timecode,
+                                               TIMECODE_LENGTH);
             }
 
             if (is_same_string("NMEAquery", pc_message, 9))
@@ -168,9 +164,12 @@ int main(void)
 
         if (GPS_UART == DONE)
         {
+            parse_nmea(gps_message,gps_message_length);
+
             gps_message[gps_message_length] = '\n';
             HAL_UART_Transmit_IT(&huart2, (uint8_t*) gps_message,
                     gps_message_length + 1);
+            concat_timecode();
             GPS_UART = IDLE;
         }
 

@@ -9,11 +9,12 @@
 #include "stdbool.h"
 #include "stdint.h"
 #include "stm32f3xx_hal.h"
+#include "gps_parsing.h"
 
 char pc_message[INPUT_LENGTH];
 char gps_message[INPUT_LENGTH];
 
-char timecode[TIMECODE_LENGTH];
+char timecode[TIMECODE_LENGTH+1];
 uint32_t timecode_pulse[TIMECODE_LENGTH];
 
 volatile int pc_message_length = 0;
@@ -65,37 +66,6 @@ void handle_uart_interrupt_gps(char inchar)
     }
 }
 
-void concat_timecode()
-{
-    static uint16_t seconds = 0;
-
-    timecode[0] = 'P';
-
-    for (int i = 0; i<TIMECODE_LENGTH-1; i++)
-    {
-        timecode[i+1] = '0' + (seconds>>i & 1);
-    }
-
-    for (int i = 0; i<TIMECODE_LENGTH;i++)
-    {
-        switch(timecode[i])
-        {
-        case 'P':
-            timecode_pulse[i] = 310;
-            break;
-        case '0':
-            timecode_pulse[i] = 0x000;
-            break;
-        case '1':
-            timecode_pulse[i] = 620;
-            break;
-        default:
-            timecode_pulse[i] = 0x000;
-        }
-    }
-
-    seconds++;
-}
 
 bool is_same_string(const char str1[], const char str2[], int length)
 {

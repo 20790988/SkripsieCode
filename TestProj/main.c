@@ -28,7 +28,7 @@ void parse_date(char* time);
 uint32_t parse_char(char c);
 float parse_double(char* str,uint32_t len);
 void copy_array_by_value(char* original, char* copy, uint32_t len);
-void insert_binary_uint32_to_string(char* p_timecode, uint32_t num, uint32_t len);
+void insert_binary_into_string(char* p_timecode, uint32_t num, uint32_t len);
 uint32_t days_in_year(uint32_t year, uint32_t month, uint32_t day);
 
 int main()
@@ -39,7 +39,7 @@ int main()
     //char str[] = "P000I";
     //for (uint32_t i = 0; i<18;i++)
     //{
-    //    insert_binary_uint32_to_string(&str[1], i, 3);
+    //    insert_binary_into_string(&str[1], i, 3);
     //    puts(str);
     //}
     concat_timecode(2020,9,21,15,50,31);
@@ -51,23 +51,23 @@ void concat_timecode(uint32_t year, uint32_t month, uint32_t day, uint32_t hour,
     char timecode[TIMECODE_LENGTH+1] =
     "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
 
-    insert_binary_uint32_to_string(&timecode[1],seconds%10,4);
-    insert_binary_uint32_to_string(&timecode[6],seconds/10,3);
+    insert_binary_into_string(&timecode[1],seconds%10,4);
+    insert_binary_into_string(&timecode[6],seconds/10,3);
 
-    insert_binary_uint32_to_string(&timecode[10],minute%10,4);
-    insert_binary_uint32_to_string(&timecode[15],minute/10,3);
+    insert_binary_into_string(&timecode[10],minute%10,4);
+    insert_binary_into_string(&timecode[15],minute/10,3);
 
-    insert_binary_uint32_to_string(&timecode[20],hour%10,4);
-    insert_binary_uint32_to_string(&timecode[25],hour/10,2);
+    insert_binary_into_string(&timecode[20],hour%10,4);
+    insert_binary_into_string(&timecode[25],hour/10,2);
 
     uint32_t day_of_year = days_in_year(year,month,day);
     printf("days of year %d\n",day_of_year);
-    insert_binary_uint32_to_string(&timecode[30],day_of_year%10,4);
-    insert_binary_uint32_to_string(&timecode[35],(day_of_year%100)/10,4);
-    insert_binary_uint32_to_string(&timecode[40],day_of_year/100,2);
+    insert_binary_into_string(&timecode[30],day_of_year%10,4);
+    insert_binary_into_string(&timecode[35],(day_of_year%100)/10,4);
+    insert_binary_into_string(&timecode[40],day_of_year/100,2);
 
-    insert_binary_uint32_to_string(&timecode[50],year%10,4);
-    insert_binary_uint32_to_string(&timecode[55],(year%100)/10,4);
+    insert_binary_into_string(&timecode[50],year%10,4);
+    insert_binary_into_string(&timecode[55],(year%100)/10,4);
 
 
     uint32_t seconds_of_day = hour*3600+minute*60+seconds;
@@ -102,7 +102,7 @@ uint32_t days_in_year(uint32_t year, uint32_t month, uint32_t day)
     return day_of_year;
 }
 
-void insert_binary_uint32_to_string(char* p_timecode, uint32_t num, uint32_t len)
+void insert_binary_into_string(char* p_timecode, uint32_t num, uint32_t len)
 {
     puts(p_timecode);
     printf("%d\n",num);

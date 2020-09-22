@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usercode.h"
+#include "gps_parsing.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -217,6 +218,7 @@ void EXTI0_IRQHandler(void)
   HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
   HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)timecode_pulse, TIMECODE_LENGTH, DAC_ALIGN_12B_R);
   HAL_TIM_Base_Start_IT(&htim6);
+
   concat_timecode();
 
   /* USER CODE END EXTI0_IRQn 1 */
