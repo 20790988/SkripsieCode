@@ -26,6 +26,8 @@
 /* USER CODE END Includes */
 extern DMA_HandleTypeDef hdma_dac1_ch1;
 
+extern DMA_HandleTypeDef hdma_dac2_ch1;
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -111,7 +113,7 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
     hdma_dac1_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_dac1_ch1.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dac1_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_dac1_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dac1_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_dac1_ch1.Init.Mode = DMA_NORMAL;
     hdma_dac1_ch1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     if (HAL_DMA_Init(&hdma_dac1_ch1) != HAL_OK)
@@ -129,6 +131,49 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
   /* USER CODE BEGIN DAC1_MspInit 1 */
 
   /* USER CODE END DAC1_MspInit 1 */
+  }
+  else if(hdac->Instance==DAC2)
+  {
+  /* USER CODE BEGIN DAC2_MspInit 0 */
+
+  /* USER CODE END DAC2_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_DAC2_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**DAC2 GPIO Configuration
+    PA6     ------> DAC2_OUT1
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_6;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* DAC2 DMA Init */
+    /* DAC2_CH1 Init */
+    hdma_dac2_ch1.Instance = DMA1_Channel5;
+    hdma_dac2_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_dac2_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dac2_ch1.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dac2_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dac2_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_dac2_ch1.Init.Mode = DMA_CIRCULAR;
+    hdma_dac2_ch1.Init.Priority = DMA_PRIORITY_HIGH;
+    if (HAL_DMA_Init(&hdma_dac2_ch1) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_DMA_REMAP_CHANNEL_ENABLE(HAL_REMAPDMA_DAC2_CH1_DMA1_CH5);
+
+    __HAL_LINKDMA(hdac,DMA_Handle1,hdma_dac2_ch1);
+
+    /* DAC2 interrupt Init */
+    HAL_NVIC_SetPriority(TIM7_DAC2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM7_DAC2_IRQn);
+  /* USER CODE BEGIN DAC2_MspInit 1 */
+
+  /* USER CODE END DAC2_MspInit 1 */
   }
 
 }
@@ -169,6 +214,28 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef* hdac)
   /* USER CODE BEGIN DAC1_MspDeInit 1 */
 
   /* USER CODE END DAC1_MspDeInit 1 */
+  }
+  else if(hdac->Instance==DAC2)
+  {
+  /* USER CODE BEGIN DAC2_MspDeInit 0 */
+
+  /* USER CODE END DAC2_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_DAC2_CLK_DISABLE();
+
+    /**DAC2 GPIO Configuration
+    PA6     ------> DAC2_OUT1
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_6);
+
+    /* DAC2 DMA DeInit */
+    HAL_DMA_DeInit(hdac->DMA_Handle1);
+
+    /* DAC2 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(TIM7_DAC2_IRQn);
+  /* USER CODE BEGIN DAC2_MspDeInit 1 */
+
+  /* USER CODE END DAC2_MspDeInit 1 */
   }
 
 }

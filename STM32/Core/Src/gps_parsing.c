@@ -15,8 +15,9 @@
 
 #define IGNORE_CHECKSUM
 
-char timecode[TIMECODE_LENGTH+1]=  "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
-uint32_t timecode_pulse[TIMECODE_LENGTH*PULSE_LENGTH];
+char timecode[TIMECODE_LENGTH + 1] =
+        "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
+uint8_t timecode_pulse[TIMECODE_LENGTH * PULSE_LENGTH];
 
 static uint32_t hour = 0;
 static uint32_t min = 0;
@@ -64,28 +65,44 @@ void concat_timecode()
         }
     }
 
+    uint8_t sine[SINE_LENGTH];
+    generate_sine(sine, SINE_LENGTH);
+
     for (int i = 0; i < TIMECODE_LENGTH; i++)
     {
-        uint32_t position = i*PULSE_LENGTH;
+        uint32_t position = i * PULSE_LENGTH;
         switch (timecode[i])
         {
         case 'P':
-            timecode_pulse[position] = 310;
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 8);
             break;
         case 'I':
-            timecode_pulse[position] = 155;
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 1);
             break;
         case '0':
-            timecode_pulse[position] = 0x000;
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
             break;
         case '1':
-            timecode_pulse[position] = 620;
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 5);
             break;
         default:
-            timecode_pulse[position] = 0x000;
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 0);
+            //ENCODING ERROR
         }
+    }
+}
 
-        timecode_pulse[position+1] = 0x000;
+void generate_sine(uint8_t target[], uint32_t length)
+{
+    uint32_t bin_max = 0xFF;
+    uint32_t voltage_max = 3300;
+    uint32_t voltage_pp = 1000;
+    uint32_t bin_pp = bin_max * voltage_pp / voltage_max;
+
+    for (uint32_t i = 0; i < length; i++)
+    {
+        target[i] = (uint16_t) ((sin(i * 2 * M_PI / length) + 1)
+                * ((bin_pp + 1) / 2));
     }
 }
 
@@ -125,28 +142,28 @@ void insert_binary_into_string(char *p_timecode, uint32_t num, uint32_t len)
     }
 }
 
-void print_b(uint32_t num, uint32_t nibbles)
-{
-    uint32_t len = nibbles * 4;
-    char str[len + 1];
-
-    for (uint32_t i = 0; i < len; i++)
-    {
-        str[len - i - 1] = '0' + (num >> i & 1);
-    }
-
-    str[len] = '\0';
-
-    for (uint32_t i = 0; i < len / 4; i++)
-    {
-        char temp[5];
-        temp[0] = str[i * 4 + 0];
-        temp[1] = str[i * 4 + 1];
-        temp[2] = str[i * 4 + 2];
-        temp[3] = str[i * 4 + 3];
-        temp[4] = '\0';
-    }
-}
+//void print_b(uint32_t num, uint32_t nibbles)
+//{
+//    uint32_t len = nibbles * 4;
+//    char str[len + 1];
+//
+//    for (uint32_t i = 0; i < len; i++)
+//    {
+//        str[len - i - 1] = '0' + (num >> i & 1);
+//    }
+//
+//    str[len] = '\0';
+//
+//    for (uint32_t i = 0; i < len / 4; i++)
+//    {
+//        char temp[5];
+//        temp[0] = str[i * 4 + 0];
+//        temp[1] = str[i * 4 + 1];
+//        temp[2] = str[i * 4 + 2];
+//        temp[3] = str[i * 4 + 3];
+//        temp[4] = '\0';
+//    }
+//}
 
 bool is_checksum_good(char *givenString, uint32_t len)
 {
@@ -392,5 +409,28 @@ void copy_array_by_value(char *original, char *copy, uint32_t len)
     for (i = 0; i < len; i++)
     {
         copy[i] = original[i];
+    }
+}
+
+void copy_pulse(uint8_t *original, uint8_t *copy, uint32_t len,
+        uint32_t num_copies)
+{
+    uint32_t index_copy = 0;
+    uint32_t index_segment = 0;
+
+    for (index_copy = 0; index_copy < PULSE_LENGTH / len; index_copy++)
+    {
+        for (index_segment = 0; index_segment < len; index_segment++)
+        {
+            if (index_copy < num_copies)
+            {
+                copy[index_copy * len + index_segment] =
+                        original[index_segment];
+            }
+            else
+            {
+                copy[index_copy * len + index_segment] = 0x0;
+            }
+        }
     }
 }
