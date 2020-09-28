@@ -173,12 +173,15 @@ int main(void)
 
         if (GPS_UART == DONE)
         {
-            parse_nmea(gps_message,gps_message_length);
+            bool correct_msg_type = parse_nmea(gps_message,gps_message_length);
 
             gps_message[gps_message_length] = '\n';
             HAL_UART_Transmit_IT(&huart2, (uint8_t*) gps_message,
                     gps_message_length + 1);
-            concat_timecode();
+            if (correct_msg_type)
+            {
+                concat_timecode();
+            }
             GPS_UART = IDLE;
         }
 
@@ -389,7 +392,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 7;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 200;
+  htim6.Init.Period = 199;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {

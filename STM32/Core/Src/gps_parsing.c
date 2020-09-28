@@ -65,8 +65,14 @@ void concat_timecode()
         }
     }
 
-    uint8_t sine[SINE_LENGTH];
-    generate_sine(sine, SINE_LENGTH);
+    static uint8_t sine[SINE_LENGTH];
+
+    static bool is_generated = false;
+    if (is_generated == false)
+    {
+        generate_sine(sine, SINE_LENGTH);
+        is_generated = true;
+    }
 
     for (int i = 0; i < TIMECODE_LENGTH; i++)
     {
@@ -191,7 +197,7 @@ bool is_checksum_good(char *givenString, uint32_t len)
 
 //checks if the given string is a GPGGA message
 //if so, extracts the time, latitude, longitude and altitude to local variables
-void parse_nmea(char *GPSString, uint32_t GPSStringLen)
+bool parse_nmea(char *GPSString, uint32_t GPSStringLen)
 {
     uint32_t l_hour = 0;
     uint32_t l_min = 0;
@@ -212,7 +218,7 @@ void parse_nmea(char *GPSString, uint32_t GPSStringLen)
 
     if (!equals("GPRMC", &GPSString[0], 5, false))
     {
-        return;
+        return false;
     }
 
     for (i = 0; i < GPSStringLen; i++)
@@ -313,6 +319,7 @@ void parse_nmea(char *GPSString, uint32_t GPSStringLen)
 
 //    lat = l_lat;
 //    lon = l_lon;
+    return true;
 }
 
 //checks if two strings have the same characters up until length len

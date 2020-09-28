@@ -15,7 +15,7 @@
 void concat_timecode();
 void print_b(uint32_t num, uint32_t nibbles);
 bool is_checksum_good(char* givenString, uint32_t len);
-void parse_nmea(char* GPSString, uint32_t GPSStringLen);
+bool parse_nmea(char* GPSString, uint32_t GPSStringLen);
 bool equals(char* str1, char* str2, uint32_t len, bool ignoreCase);
 void parse_time(char* time);
 void parse_date(char* time);
