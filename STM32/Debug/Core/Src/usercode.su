@@ -1,4 +1,4 @@
 usercode.c:28:6:handle_uart_interrupt_pc	0	static
 usercode.c:49:6:handle_uart_interrupt_gps	0	static
-usercode.c:71:6:is_same_string	4	static
+usercode.c:71:6:is_same_string	8	static
 usercode.c:85:6:HAL_DAC_ConvCpltCallbackCh1	8	static

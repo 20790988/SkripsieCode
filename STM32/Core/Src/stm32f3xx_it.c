@@ -248,16 +248,16 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
   static uint32_t toggle = 0;
-  if (toggle == 0)
-  {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-      toggle = 1;
-  }
-  else
-  {
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-      toggle = 0;
-  }
+    if (toggle == 0)
+    {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+        toggle = 1;
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+        toggle = 0;
+    }
   /* USER CODE END TIM2_IRQn 1 */
 }
 

@@ -1,7 +1,7 @@
 stm32f3xx_hal_i2c.c:5851:13:I2C_Flush_TXDR	0	static
 stm32f3xx_hal_i2c.c:6312:13:I2C_TransferConfig	12	static
 stm32f3xx_hal_i2c.c:6331:13:I2C_Enable_IRQ	0	static
-stm32f3xx_hal_i2c.c:6402:13:I2C_Disable_IRQ	0	static
+stm32f3xx_hal_i2c.c:6402:13:I2C_Disable_IRQ	4	static
 stm32f3xx_hal_i2c.c:6465:13:I2C_ConvertOtherXferOptions	0	static
 stm32f3xx_hal_i2c.c:6244:26:I2C_IsAcknowledgeFailed	16	static
 stm32f3xx_hal_i2c.c:6110:26:I2C_WaitOnTXISFlagUntilTimeout	16	static

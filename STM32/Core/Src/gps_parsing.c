@@ -83,7 +83,7 @@ void concat_timecode()
             copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 8);
             break;
         case 'I':
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 1);
+            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
             break;
         case '0':
             copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
@@ -102,7 +102,7 @@ void generate_sine(uint8_t target[], uint32_t length)
 {
     uint32_t bin_max = 0xFF;
     uint32_t voltage_max = 3300;
-    uint32_t voltage_pp = 1000;
+    uint32_t voltage_pp = 500;
     uint32_t bin_pp = bin_max * voltage_pp / voltage_max;
 
     for (uint32_t i = 0; i < length; i++)
@@ -199,6 +199,7 @@ bool is_checksum_good(char *givenString, uint32_t len)
 //if so, extracts the time, latitude, longitude and altitude to local variables
 bool parse_nmea(char *GPSString, uint32_t GPSStringLen)
 {
+
     uint32_t l_hour = 0;
     uint32_t l_min = 0;
     uint32_t l_sec = 0;
@@ -215,66 +216,64 @@ bool parse_nmea(char *GPSString, uint32_t GPSStringLen)
     uint32_t i = 0;
     uint32_t numStrings = 0;
     bool GPSFix = false;
+    bool is_GPRMC_msg = equals("GPRMC", &GPSString[0], 5, false);
 
-    if (!equals("GPRMC", &GPSString[0], 5, false))
+    if (is_GPRMC_msg)
     {
-        return false;
-    }
-
-    for (i = 0; i < GPSStringLen; i++)
-    {
-        if (GPSString[i] == ',')
+        for (i = 0; i < GPSStringLen; i++)
         {
-            p_strings[numStrings] = &GPSString[i + 1];
-            numStrings++;
+            if (GPSString[i] == ',')
+            {
+                p_strings[numStrings] = &GPSString[i + 1];
+                numStrings++;
+            }
         }
-    }
-    /*
-     *  0 - hhmmss.sss
-     *  1 - 'A'ctive or 'V'oid
-     *  2 - ddmm.mmmmm lat
-     *  3 - N or S
-     *  4 - dddmm.mmmm long
-     *  5 - E or W
-     *  6 - x.xx knots
-     *  7 - xxx.xx degrees course
-     *  8 - ddmmyy
-     *  9 - xx.x degrees magnetic variation
-     *  10 - E or W magnetic variation
-     */
+        /*
+         *  0 - hhmmss.sss
+         *  1 - 'A'ctive or 'V'oid
+         *  2 - ddmm.mmmmm lat
+         *  3 - N or S
+         *  4 - dddmm.mmmm long
+         *  5 - E or W
+         *  6 - x.xx knots
+         *  7 - xxx.xx degrees course
+         *  8 - ddmmyy
+         *  9 - xx.x degrees magnetic variation
+         *  10 - E or W magnetic variation
+         */
 
-    //parse time
-    if (p_strings[1] - p_strings[0] != 1)
-    {
-        char *time = p_strings[0];
-        l_hour = 10 * parse_char(time[0]) + parse_char(time[1]);
-        l_min = 10 * parse_char(time[2]) + parse_char(time[3]);
-        l_sec = 10 * parse_char(time[4]) + parse_char(time[5]);
-    }
-
-    //parse date
-    if (p_strings[9] - p_strings[8] != 1)
-    {
-        char *p_date = p_strings[8];
-        l_day = 10 * parse_char(p_date[0]) + parse_char(p_date[1]);
-        l_month = 10 * parse_char(p_date[2]) + parse_char(p_date[3]);
-        l_year = 10 * parse_char(p_date[4]) + parse_char(p_date[5]);
-    }
-
-    //check if device has a gps fix
-    if (p_strings[2] - p_strings[1] != 1)
-    {
-        if (p_strings[1][0] == 'A')
+        //parse time
+        if (p_strings[1] - p_strings[0] != 1)
         {
-            GPSFix = true;
+            char *time = p_strings[0];
+            l_hour = 10 * parse_char(time[0]) + parse_char(time[1]);
+            l_min = 10 * parse_char(time[2]) + parse_char(time[3]);
+            l_sec = 10 * parse_char(time[4]) + parse_char(time[5]);
         }
-        else
-        {
-            GPSFix = false;
-        }
-    }
 
-    //parse latitude if it has gps fix
+        //parse date
+        if (p_strings[9] - p_strings[8] != 1)
+        {
+            char *p_date = p_strings[8];
+            l_day = 10 * parse_char(p_date[0]) + parse_char(p_date[1]);
+            l_month = 10 * parse_char(p_date[2]) + parse_char(p_date[3]);
+            l_year = 10 * parse_char(p_date[4]) + parse_char(p_date[5]);
+        }
+
+        //check if device has a gps fix
+        if (p_strings[2] - p_strings[1] != 1)
+        {
+            if (p_strings[1][0] == 'A')
+            {
+                GPSFix = true;
+            }
+            else
+            {
+                GPSFix = false;
+            }
+        }
+
+        //parse latitude if it has gps fix
 //    if (p_strings[3] - p_strings[2] != 1 && GPSFix)
 //    {
 //        l_lat = 10 * parse_char(p_strings[2][0]) + parse_char(p_strings[2][1])
@@ -307,19 +306,21 @@ bool parse_nmea(char *GPSString, uint32_t GPSStringLen)
 //        }
 //    }
 
+
+        hour = l_hour;
+        min = l_min;
+        sec = l_sec;
+
+        year = l_year;
+        month = l_month;
+        day = l_day;
+
+        //    lat = l_lat;
+        //    lon = l_lon;
+    }
+
     free(p_strings);
-
-    hour = l_hour;
-    min = l_min;
-    sec = l_sec;
-
-    year = l_year;
-    month = l_month;
-    day = l_day;
-
-//    lat = l_lat;
-//    lon = l_lon;
-    return true;
+    return is_GPRMC_msg;
 }
 
 //checks if two strings have the same characters up until length len
@@ -436,7 +437,7 @@ void copy_pulse(uint8_t *original, uint8_t *copy, uint32_t len,
             }
             else
             {
-                copy[index_copy * len + index_segment] = 0x0;
+                copy[index_copy * len + index_segment] = 38/2;
             }
         }
     }
