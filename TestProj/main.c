@@ -26,8 +26,10 @@ char timecode[TIMECODE_LENGTH + 1] =
 
 int main()
 {
-    concat_timecode();
-    puts(timecode);
+    char str[] = "ABCDEFGHIJKLMNOP";
+    char * p_strings[10];
+    p_strings[1] = &str[5];
+    puts(p_strings[1]);
     return 0;
 }
 

@@ -163,10 +163,19 @@ int main(void)
 
             if (is_same_string("NMEAset", pc_message, 7))
             {
-                HAL_UART_Transmit_IT(&huart1,
-                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
-                        51);
+//                HAL_UART_Transmit_IT(&huart1,
+//                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
+//                        51);
+                HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS03,0,0,0,0,1,0,0,0*03\r\n", 28);
             }
+
+            if (is_same_string("NMEAreset", pc_message, 9))
+                        {
+            //                HAL_UART_Transmit_IT(&huart1,
+            //                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
+            //                        51);
+                            HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS10,3*1F\r\n", 14);
+                        }
 
             PC_UART = IDLE;
         }
