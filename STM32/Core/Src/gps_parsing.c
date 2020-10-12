@@ -17,7 +17,7 @@
 
 char timecode[TIMECODE_LENGTH + 1] =
         "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
-uint8_t timecode_pulse[TIMECODE_LENGTH * PULSE_LENGTH];
+bool timecode_bool[TIMECODE_LENGTH * SINES_PER_CHARACTER];
 
 static uint32_t hour = 0;
 static uint32_t min = 0;
@@ -65,52 +65,31 @@ void concat_timecode()
         }
     }
 
-    static uint8_t sine[SINE_LENGTH];
-
-    static bool is_generated = false;
-    if (is_generated == false)
-    {
-        generate_sine(sine, SINE_LENGTH);
-        is_generated = true;
-    }
-
     for (int i = 0; i < TIMECODE_LENGTH; i++)
     {
-        uint32_t position = i * PULSE_LENGTH;
+        uint32_t position = i * SINES_PER_CHARACTER;
         switch (timecode[i])
         {
         case 'P':
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 8);
+            fill_bool(&timecode_bool[position],8,SINES_PER_CHARACTER);
             break;
         case 'I':
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
+            fill_bool(&timecode_bool[position],2,SINES_PER_CHARACTER);
             break;
         case '0':
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
+            fill_bool(&timecode_bool[position],2,SINES_PER_CHARACTER);
             break;
         case '1':
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 5);
+            fill_bool(&timecode_bool[position],5,SINES_PER_CHARACTER);
             break;
         default:
-            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 0);
+            fill_bool(&timecode_bool[position],10,SINES_PER_CHARACTER);
             //ENCODING ERROR
         }
     }
 }
 
-void generate_sine(uint8_t target[], uint32_t length)
-{
-    uint32_t bin_max = 0xFF;
-    uint32_t voltage_max = 3300;
-    uint32_t voltage_pp = 500;
-    uint32_t bin_pp = bin_max * voltage_pp / voltage_max;
 
-    for (uint32_t i = 0; i < length; i++)
-    {
-        target[i] = (uint16_t) ((sin(i * 2 * M_PI / length) + 1)
-                * ((bin_pp + 1) / 2));
-    }
-}
 
 uint32_t days_in_year(uint32_t year, uint32_t month, uint32_t day)
 {
@@ -420,25 +399,40 @@ void copy_array_by_value(char *original, char *copy, uint32_t len)
     }
 }
 
-void copy_pulse(uint8_t *original, uint8_t *copy, uint32_t len,
-        uint32_t num_copies)
-{
-    uint32_t index_copy = 0;
-    uint32_t index_segment = 0;
+//void copy_pulse(uint8_t *original, uint8_t *copy, uint32_t len,
+//        uint32_t num_copies)
+//{
+//    uint32_t index_copy = 0;
+//    uint32_t index_segment = 0;
+//
+//    for (index_copy = 0; index_copy < PULSE_LENGTH / len; index_copy++)
+//    {
+//        for (index_segment = 0; index_segment < len; index_segment++)
+//        {
+//            if (index_copy < num_copies)
+//            {
+//                copy[index_copy * len + index_segment] =
+//                        original[index_segment];
+//            }
+//            else
+//            {
+//                copy[index_copy * len + index_segment] = 38/2;
+//            }
+//        }
+//    }
+//}
 
-    for (index_copy = 0; index_copy < PULSE_LENGTH / len; index_copy++)
+void fill_bool(bool target[], uint32_t ones, uint32_t length)
+{
+    for (uint32_t i = 0; i<length; i++)
     {
-        for (index_segment = 0; index_segment < len; index_segment++)
+        if (i<ones)
         {
-            if (index_copy < num_copies)
-            {
-                copy[index_copy * len + index_segment] =
-                        original[index_segment];
-            }
-            else
-            {
-                copy[index_copy * len + index_segment] = 38/2;
-            }
+            target[i] = true;
+        }
+        else
+        {
+            target[i] = false;
         }
     }
 }
