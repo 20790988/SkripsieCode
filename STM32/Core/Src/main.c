@@ -61,6 +61,7 @@ extern char gps_message[];
 extern volatile int pc_message_length;
 extern volatile int gps_message_length;
 extern char timecode[];
+extern uint8_t test_code[];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,9 +131,11 @@ int main(void)
     HAL_TIM_Base_Start_IT(&htim6);
     HAL_TIM_Base_Start_IT(&htim2);
     //test modulating signal
-//    uint8_t test_sine[SINE_LENGTH];
-//    generate_sine(test_sine,SINE_LENGTH);
-//    HAL_DAC_Start_DMA(&hdac2, DAC_CHANNEL_1, test_sine, SINE_LENGTH, DAC_ALIGN_8B_R);
+    //uint8_t test_sine[10];
+    //generate_sine(test_sine,10);
+
+    //HAL_DAC_Start_DMA(&hdac2, DAC_CHANNEL_1, test_code, 20, DAC_ALIGN_8B_R);
+    DAC_startup();
 
   /* USER CODE END 2 */
 
@@ -504,6 +507,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 
 }
 
