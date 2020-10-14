@@ -20,8 +20,6 @@ typedef enum Receiver receiver_t;
 void handle_uart_interrupt_pc(char inchar);
 void handle_uart_interrupt_gps(char inchar);
 
-void DAC_startup();
-
 bool is_same_string(const char str1[], const char str2[],int length);
 
 #endif /* INC_USERCODE_H_ */

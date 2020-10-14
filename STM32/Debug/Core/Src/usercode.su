@@ -1,7 +1,4 @@
-usercode.c:34:6:handle_uart_interrupt_pc	0	static
-usercode.c:55:6:handle_uart_interrupt_gps	0	static
-usercode.c:76:6:is_same_string	8	static
-usercode.c:90:6:DAC_startup	16	static
-usercode.c:96:6:HAL_DAC_ConvCpltCallbackCh1	16	static
-usercode.c:123:6:HAL_DAC_ConvCpltCallbackCh2	0	static
-usercode.c:134:6:HAL_DAC_ConvHalfCpltCallbackCh1	0	static
+usercode.c:28:6:handle_uart_interrupt_pc	0	static
+usercode.c:49:6:handle_uart_interrupt_gps	0	static
+usercode.c:71:6:is_same_string	8	static
+usercode.c:85:6:HAL_DAC_ConvCpltCallbackCh1	8	static
