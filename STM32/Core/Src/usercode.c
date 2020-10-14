@@ -21,6 +21,7 @@ volatile int pc_message_length = 0;
 volatile int gps_message_length = 0;
 volatile receiver_t PC_UART = IDLE;
 volatile receiver_t GPS_UART = IDLE;
+volatile bool should_concat_timecode = false;
 
 extern TIM_HandleTypeDef htim6;
 
@@ -85,7 +86,11 @@ bool is_same_string(const char str1[], const char str2[], int length)
 void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdac)
 {
     //HAL_DAC_Stop_DMA(hdac, DAC_CHANNEL_1);
+
+    should_concat_timecode = true;
+    HAL_DAC_Stop_DMA(hdac, DAC_CHANNEL_1);
     HAL_TIM_Base_Stop_IT(&htim6);
+    HAL_DAC_Start_DMA(hdac, DAC_CHANNEL_1, timecode_pulse, TIMECODE_LENGTH*PULSE_LENGTH, DAC_ALIGN_8B_R);
 }
 
 
