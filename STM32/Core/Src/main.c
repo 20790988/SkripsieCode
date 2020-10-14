@@ -62,9 +62,6 @@ extern volatile int pc_message_length;
 extern volatile int gps_message_length;
 extern char timecode[];
 extern uint8_t test_code[];
-
-extern volatile bool should_concat_timecode;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -194,17 +191,11 @@ int main(void)
             gps_message[gps_message_length] = '\n';
             HAL_UART_Transmit_IT(&huart2, (uint8_t*) gps_message,
                     gps_message_length + 1);
-//            if (correct_msg_type)
-//            {
-//                concat_timecode();
-//            }
+            if (correct_msg_type)
+            {
+                concat_timecode();
+            }
             GPS_UART = IDLE;
-        }
-
-        if (should_concat_timecode)
-        {
-            concat_timecode();
-            should_concat_timecode = false;
         }
 
     /* USER CODE END WHILE */
@@ -414,7 +405,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 7;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 47;
+  htim6.Init.Period = 49;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {

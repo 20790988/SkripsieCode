@@ -36,7 +36,7 @@ int main()
     uint32_t voltage_pp = 500;
     uint32_t bin_pp = bin_max * voltage_pp / voltage_max;
     uint32_t length = 5;
-    target
+
     target[0] = (bin_pp + 1) / 2;
     for (uint32_t i = 1; i < length; i++)
     {

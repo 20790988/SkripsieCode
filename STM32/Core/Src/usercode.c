@@ -33,8 +33,6 @@ volatile int gps_message_length = 0;
 volatile receiver_t PC_UART = IDLE;
 volatile receiver_t GPS_UART = IDLE;
 
-volatile bool should_concat_timecode = false;
-
 extern DAC_HandleTypeDef hdac1;
 extern DAC_HandleTypeDef hdac2;
 extern TIM_HandleTypeDef htim6;
@@ -131,7 +129,6 @@ void handle_DAC_Callback(bool from_interrupt)
     {
         HAL_TIM_Base_Stop_IT(&htim6);
         p_next_DAC_output = sine;
-        should_concat_timecode = true;
     }
     else
     {
