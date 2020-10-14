@@ -130,13 +130,12 @@ int main(void)
 
     HAL_TIM_Base_Start_IT(&htim6);
     HAL_TIM_Base_Start_IT(&htim2);
-    setup_sine();
     //test modulating signal
     //uint8_t test_sine[10];
     //generate_sine(test_sine,10);
 
     //HAL_DAC_Start_DMA(&hdac2, DAC_CHANNEL_1, test_code, 20, DAC_ALIGN_8B_R);
-    //DAC_startup();
+    DAC_startup();
 
   /* USER CODE END 2 */
 
@@ -405,7 +404,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 7;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 49;
+  htim6.Init.Period = 198;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {

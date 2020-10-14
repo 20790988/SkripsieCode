@@ -5,10 +5,9 @@
 #include <stdbool.h>
 
 #define TIMECODE_LENGTH 100
-#define SINES_PER_CHARACTER 10
-#define SINE_LENGTH 5
-
 #define IGNORE_CHECKSUM
+
+#define PULSE_LENGTH 10
 
 void concat_timecode();
 void insert_binary_into_string(char *p_timecode, uint32_t num, uint32_t len);
@@ -24,43 +23,14 @@ static uint32_t day = 1;
 char timecode[TIMECODE_LENGTH + 1] =
         "P0000I000P0000I000IP0000I00IIP0000I0000P00IIIIIIIP0000I0000P000000000P000000000P000000000P00000000IP";
 
-bool timecode_bool[TIMECODE_LENGTH * SINES_PER_CHARACTER];
-void fill_bool(bool target[], uint32_t ones, uint32_t length);
-void concat_timecode();
-void insert_binary_into_string(char *p_timecode, uint32_t num, uint32_t len);
 
 int main()
 {
-    uint32_t bin_max = 0xFF;
-    uint32_t voltage_max = 3300;
-    uint32_t voltage_pp = 500;
-    uint32_t bin_pp = bin_max * voltage_pp / voltage_max;
-    uint32_t length = 5;
-
-    target[0] = (bin_pp + 1) / 2;
-    for (uint32_t i = 1; i < length; i++)
-    {
-        target[i] = (uint8_t) ((sin(i * 2 * M_PI / length) + 1)
-                * ((bin_pp + 1) / 2));
-
-        printf("%d\n",target[i]);
-    }
+    char str[] = "ABCDEFGHIJKLMNOP";
+    char * p_strings[10];
+    p_strings[1] = &str[5];
+    puts(p_strings[1]);
     return 0;
-}
-
-void fill_bool(bool target[], uint32_t ones, uint32_t length)
-{
-    for (uint32_t i = 0; i<length; i++)
-    {
-        if (i<ones)
-        {
-            target[i] = true;
-        }
-        else
-        {
-            target[i] = false;
-        }
-    }
 }
 
 void concat_timecode()
@@ -98,28 +68,37 @@ void concat_timecode()
         }
     }
 
-    for (int i = 0; i < TIMECODE_LENGTH; i++)
-    {
-        uint32_t position = i * SINES_PER_CHARACTER;
-        switch (timecode[i])
-        {
-        case 'P':
-            fill_bool(&timecode_bool[position],8,SINES_PER_CHARACTER);
-            break;
-        case 'I':
-            fill_bool(&timecode_bool[position],2,SINES_PER_CHARACTER);
-            break;
-        case '0':
-            fill_bool(&timecode_bool[position],2,SINES_PER_CHARACTER);
-            break;
-        case '1':
-            fill_bool(&timecode_bool[position],5,SINES_PER_CHARACTER);
-            break;
-        default:
-            fill_bool(&timecode_bool[position],10,SINES_PER_CHARACTER);
-            //ENCODING ERROR
-        }
-    }
+//    static uint8_t sine[SINE_LENGTH];
+//
+//    static bool is_generated = false;
+//    if (is_generated == false)
+//    {
+//        generate_sine(sine, SINE_LENGTH);
+//        is_generated = true;
+//    }
+//
+//    for (int i = 0; i < TIMECODE_LENGTH; i++)
+//    {
+//        uint32_t position = i * PULSE_LENGTH;
+//        switch (timecode[i])
+//        {
+//        case 'P':
+//            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 8);
+//            break;
+//        case 'I':
+//            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
+//            break;
+//        case '0':
+//            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 2);
+//            break;
+//        case '1':
+//            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 5);
+//            break;
+//        default:
+//            copy_pulse(sine, &timecode_pulse[position], SINE_LENGTH, 0);
+//            //ENCODING ERROR
+//        }
+//    }
 }
 
 void insert_binary_into_string(char *p_timecode, uint32_t num, uint32_t len)
