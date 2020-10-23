@@ -65,6 +65,9 @@ extern char timecode[];
 extern uint8_t timecode_pulse[];
 
 extern bool should_concat_timecode;
+
+gps_t current_module = ADAFRUIT;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -151,40 +154,65 @@ int main(void)
                 HAL_UART_Transmit_IT(&huart2, (uint8_t*) "pong\n", 5);
             }
 
-            if (is_same_string("send", pc_message, 4))
-            {
-                HAL_UART_Transmit_IT(&huart2, (uint8_t*) timecode,
-                                               TIMECODE_LENGTH);
-            }
-
-            if (is_same_string("NMEAquery", pc_message, 9))
-            {
-                HAL_UART_Transmit_IT(&huart2, (uint8_t*) "query\n", 6);
-                HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PMTK414*33\r\n", 13);
-            }
+//            if (is_same_string("NMEAquery", pc_message, 9))
+//            {
+//                HAL_UART_Transmit_IT(&huart2, (uint8_t*) "query\n", 6);
+//                HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PMTK414*33\r\n", 13);
+//            }
 
             if (is_same_string("NMEAset", pc_message, 7))
             {
-//                HAL_UART_Transmit_IT(&huart1,
-//                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
-//                        51);
-                HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS03,0,0,0,0,1,0,0,0*03\r\n", 28);
+                if (current_module == ADAFRUIT)
+                {
+                    HAL_UART_Transmit_IT(&huart1,
+                            (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
+                            51);
+                }
+                else if (current_module == NEO)
+                {
+                    HAL_UART_Transmit_IT(&huart1,
+                            (uint8_t*) "$PCAS03,0,0,0,0,1,0,0,0*03\r\n     $PCAS04,1*18\r\n", 47);
+//                    HAL_Delay(50);
+//                    HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS04,1*18\r\n",
+//                            14);
+                }
             }
 
             if (is_same_string("NMEAreset", pc_message, 9))
-                        {
-            //                HAL_UART_Transmit_IT(&huart1,
-            //                        (uint8_t*) "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n",
-            //                        51);
-                            HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS10,3*1F\r\n", 14);
-                        }
+            {
+                if (current_module == ADAFRUIT)
+                {
+                    HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PMTK104*37\r\n",
+                                                               13);
+
+                }
+                else if (current_module == NEO)
+                {
+                    HAL_UART_Transmit_IT(&huart1, (uint8_t*) "$PCAS10,3*1F\r\n",
+                                            14);
+                }
+            }
+
+            if (is_same_string("GPSset", pc_message, 6))
+            {
+                if (is_same_string("neo", &pc_message[6], 3))
+                {
+                    current_module = NEO;
+                    HAL_UART_Transmit_IT(&huart2, (uint8_t*) "GPS module set to NEO\n", 22);
+                }
+                else if (is_same_string("ada", &pc_message[6], 3))
+                {
+                    current_module = ADAFRUIT;
+                    HAL_UART_Transmit_IT(&huart2, (uint8_t*) "GPS module set to Adafruit\n", 27);
+                }
+            }
 
             PC_UART = IDLE;
         }
 
         if (GPS_UART == DONE)
         {
-            bool correct_msg_type = parse_nmea(gps_message,gps_message_length);
+            bool correct_msg_type = parse_nmea(gps_message, gps_message_length);
 
             gps_message[gps_message_length] = '\n';
             HAL_UART_Transmit_IT(&huart2, (uint8_t*) gps_message,
@@ -193,15 +221,15 @@ int main(void)
             GPS_UART = IDLE;
         }
 
-        if(should_concat_timecode)
+        if (should_concat_timecode)
         {
             concat_timecode();
             should_concat_timecode = false;
         }
 
-    /* USER CODE END WHILE */
+        /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
+        /* USER CODE BEGIN 3 */
     }
   /* USER CODE END 3 */
 }

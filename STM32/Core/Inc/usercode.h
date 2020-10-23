@@ -17,6 +17,9 @@
 enum Receiver {IDLE,RECEIVING,DONE};
 typedef enum Receiver receiver_t;
 
+enum GPS_type {ADAFRUIT,NEO};
+typedef enum GPS_type gps_t;
+
 void handle_uart_interrupt_pc(char inchar);
 void handle_uart_interrupt_gps(char inchar);
 

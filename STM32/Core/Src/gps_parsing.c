@@ -216,7 +216,7 @@ bool parse_nmea(char *GPSString, uint32_t GPSStringLen)
     uint32_t i = 0;
     uint32_t numStrings = 0;
     bool GPSFix = false;
-    bool is_GPRMC_msg = equals("GNRMC", &GPSString[0], 5, false);
+    bool is_GPRMC_msg = equals("GPRMC", &GPSString[0], 5, false);
 
     if (is_GPRMC_msg)
     {
